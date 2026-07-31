@@ -1,0 +1,62 @@
+/* Firestore 安全规则
+ * 
+ * 由于本项目为个人使用、无需用户认证，
+ * 采用简单规则：仅允许经过 Firebase Admin SDK（Cloud Functions）的写入，
+ * 客户端只读公共数据。
+ *
+ * 后续如需多用户隔离，添加用户认证后再细化权限。
+ */
+
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // 拒绝所有客户端直接写入
+    match /{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // 公共行情数据：所有人可读
+    match /market_data/{doc} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // 公共资讯数据：所有人可读
+    match /news/{doc} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // 公共知识内容：所有人可读
+    match /knowledge/{doc} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // 投资目标、持仓、进度、AI分析、学习进度：
+    // 单人使用场景下所有人可读写，
+    // 升级为多用户时需增加 userId 校验
+    match /investment_goals/{userId}/{doc} {
+      allow read, write: if true;
+    }
+    match /user_holdings/{userId}/{doc} {
+      allow read, write: if true;
+    }
+    match /goal_progress/{userId}/{doc} {
+      allow read, write: if true;
+    }
+    match /ai_analysis/{userId}/{doc} {
+      allow read, write: if true;
+    }
+    match /user_progress/{userId}/{doc} {
+      allow read, write: if true;
+    }
+
+    match /orders/{userId}/{doc} {
+      allow read, write: if true;
+    }
+  }
+}

@@ -1,0 +1,16 @@
+node_modules
+dist
+.env.local
+.env.*.local
+*.log
+*.bat
+.DS_Store
+.cache
+*.tsbuildinfo
+
+# 其他项目文件
+skills/
+
+# 临时输出
+bt_output.txt
+draft_output.log
