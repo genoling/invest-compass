@@ -9,6 +9,8 @@ const TAILWIND_CONFIG = path.resolve(__dirname, "tailwind.config.ts");
 
 export default defineConfig({
   root: ROOT,
+  // 相对路径，适配 GitHub Pages 子路径部署（/invest-compass/）
+  base: "./",
   plugins: [react()],
   resolve: {
     alias: {
