@@ -35,6 +35,7 @@
 | **资产大盘** | `/dashboard` | 总资产、盈亏、目标完成度、再平衡预警、快捷入口 |
 | **实时资讯** | `/news` | 行情跑马灯（3s自动刷新）、分类/关键词筛选、无限滚动、K线图 |
 | **投资目标** | `/goals` | 目标创建（表单+Zod校验）、持仓管理、进度追踪、再平衡建议、操作历史 |
+| **量化模型** | `/quant` | 策略管理（4种模板+启停）、回测参数配置、回测结果（6项指标+权益曲线+交易记录） |
 | **AI 决策** | `/ai-advisor` | 四维度分析（情绪/技术面/基本面/风险）、操作建议、参数控制 |
 | **知识学习** | `/learn` | 6大分类、难度筛选、搜索、进度统计、全文阅读 |
 
@@ -55,21 +56,44 @@ npm run dev
 open http://localhost:3000
 ```
 
+## 安全配置
+
+**所有 API 密钥、Token 等敏感信息统一存放于 `.env.local`（已由 `.gitignore` 排除），禁止硬编码到源码中。**
+
+| 项目 | 说明 |
+|------|------|
+| **配置文件** | `.env.local`（真实密钥，不入库） |
+| **配置模板** | `.env.local.example`（脱敏，随仓库提交） |
+| **使用方式** | `cp .env.local.example .env.local` 后填入真实值 |
+| **变量前缀** | `VITE_` 前缀（Vite 约定，仅暴露给前端） |
+
+**⚠️ 安全铁律：**
+1. `.env.local` 绝不提交到 Git（已在 `.gitignore` 中排除）
+2. 提交代码前用 `git status` 确认 `.env.local` 未被暂存
+3. 若误提交，立即从仓库历史中移除并更换密钥
+4. 本项目 Mock 数据可零密钥运行；接入真实 API 时才需配置对应密钥
+
 ## 项目结构
 
 ```
 invest-compass/
 ├── public/                  # 静态资源（favicon.svg）
 ├── src/
-│   ├── app/                 # 路由页面（5个模块）
+│   ├── app/                 # 路由页面（6个模块）
+│   │   ├── dashboard/       # 资产大盘
+│   │   ├── news/            # 实时资讯
+│   │   ├── goals/           # 投资目标
+│   │   ├── quant/           # 量化模型
+│   │   ├── ai-advisor/      # AI 决策
+│   │   └── learn/           # 知识学习
 │   ├── components/          # 业务组件（17个）
 │   │   ├── layout/          # Header, Sidebar, Footer, MobileNav
 │   │   ├── dashboard/       # StatCard, AssetAllocationChart
 │   │   ├── news/            # MarketTicker, NewsCard, NewsList, NewsFilterBar, NewsDetail, KLineChart
 │   │   └── goals/           # GoalCard, GoalDetail, GoalForm, HoldingTable, RebalanceCard
 │   ├── lib/
-│   │   ├── types/           # TypeScript 类型定义（4个模块）
-│   │   ├── mock/            # Mock 数据（4个模块，零API依赖）
+│   │   ├── types/           # TypeScript 类型定义（quant/news/goal/ai/knowledge）
+│   │   ├── mock/            # Mock 数据（quant/news/goal/ai/knowledge）
 │   │   ├── firebase/        # Firestore 延迟初始化
 │   │   └── utils.ts         # cn() 工具函数
 │   ├── App.tsx              # 路由定义 + Code Splitting
@@ -108,6 +132,8 @@ npx firebase deploy
 | 资讯 | 6 条 | 宏观/行业/公司/市场分类 |
 | 投资目标 | 2 个 | 含配置比例/进度/再平衡建议 |
 | 持仓 | 7 条 | 含盈亏计算 |
+| 量化策略 | 3 个 | 3 种策略模板 + 启停开关 |
+| 量化回测 | 2 次 | 6 项指标 + 权益曲线 + 交易记录 |
 | AI 分析 | 2 条 | 四维度 + 操作建议 |
 | 知识 | 6 篇 | 6 大分类覆盖 |
 | 学习进度 | 3 条 | 已完成/学习中状态 |

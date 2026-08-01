@@ -9,6 +9,7 @@ const NewsPage = lazy(() => import("@/app/news/page"));
 const GoalsPage = lazy(() => import("@/app/goals/page"));
 const AIAdvisorPage = lazy(() => import("@/app/ai-advisor/page"));
 const LearnPage = lazy(() => import("@/app/learn/page"));
+const QuantPage = lazy(() => import("@/app/quant/page"));
 
 function PageLoader() {
   return (
@@ -63,6 +64,14 @@ export default function App() {
           element={
             <Suspense fallback={<PageLoader />}>
               <LearnPage />
+            </Suspense>
+          }
+        />
+        <Route
+          path="/quant"
+          element={
+            <Suspense fallback={<PageLoader />}>
+              <QuantPage />
             </Suspense>
           }
         />

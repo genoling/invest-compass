@@ -9,6 +9,7 @@ import {
   ArrowRight,
   AlertTriangle,
   BookOpen,
+  BarChart3,
 } from "lucide-react";
 import StatCard from "@/components/dashboard/StatCard";
 import AssetAllocationChart from "@/components/dashboard/AssetAllocationChart";
@@ -158,6 +159,19 @@ export default function DashboardPage() {
                 <div className="text-sm font-medium">知识学习</div>
                 <div className="text-xs text-muted-foreground">
                   {completed}/{totalKnowledge} 完成
+                </div>
+              </div>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </Link>
+            <Link
+              to="/quant"
+              className="flex items-center gap-3 rounded-lg border p-3 hover:bg-secondary/50 transition-colors group"
+            >
+              <BarChart3 className="h-5 w-5 text-muted-foreground group-hover:text-primary" />
+              <div className="flex-1 min-w-0">
+                <div className="text-sm font-medium">量化模型</div>
+                <div className="text-xs text-muted-foreground">
+                  策略回测 & 量化操作
                 </div>
               </div>
               <ArrowRight className="h-4 w-4 text-muted-foreground" />

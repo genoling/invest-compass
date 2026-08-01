@@ -117,50 +117,15 @@ export default function KLineChart({
             dot={false}
           />
 
-          {/* 实体柱（伪K线） */}
-          <Bar
-            dataKey="close"
-            fill="transparent"
-            shape={(props: any) => {
-              const { x, y, width, payload } = props;
-              if (!payload) return null;
-
-              const barWidth = width * 0.6;
-              const barX = x + width * 0.2;
-              const isUp = payload.close >= payload.open;
-              const color = isUp ? colorUp : colorDown;
-
-              // 影线
-              const highY =
-                ((payload.high - payload.low) /
-                  (payload.high - payload.low || 1)) *
-                0;
-              const scale = 100 / (payload.high - payload.low || 1);
-
+          {/* 实体柱（伪K线，按涨跌着色） */}
+          <Bar dataKey="close" opacity={0.35} isAnimationActive={false}>
+            {data.map((entry, index) => {
+              const isUp = entry.close >= entry.open;
               return (
-                <g>
-                  {/* 影线 */}
-                  <line
-                    x1={barX + barWidth / 2}
-                    y1={y}
-                    x2={barX + barWidth / 2}
-                    y2={y + 30}
-                    stroke={color}
-                    strokeWidth={1}
-                  />
-                  {/* 实体 */}
-                  <rect
-                    x={barX}
-                    y={Math.min(y + 5, y + 25)}
-                    width={barWidth}
-                    height={Math.abs(20)}
-                    fill={color}
-                    rx={1}
-                  />
-                </g>
+                <Cell key={index} fill={isUp ? colorUp : colorDown} />
               );
-            }}
-          />
+            })}
+          </Bar>
         </ComposedChart>
       </ResponsiveContainer>
 

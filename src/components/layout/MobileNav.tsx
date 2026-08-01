@@ -5,6 +5,7 @@ import {
   Target,
   Brain,
   BookOpen,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +13,7 @@ const navItems = [
   { to: "/dashboard", label: "大盘", icon: LayoutDashboard },
   { to: "/news", label: "资讯", icon: Newspaper },
   { to: "/goals", label: "目标", icon: Target },
+  { to: "/quant", label: "量化", icon: BarChart3 },
   { to: "/ai-advisor", label: "AI", icon: Brain },
   { to: "/learn", label: "学习", icon: BookOpen },
 ];

@@ -5,6 +5,7 @@ import {
   Target,
   Brain,
   BookOpen,
+  BarChart3,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -23,6 +24,11 @@ const navItems = [
     to: "/goals",
     label: "投资目标",
     icon: Target,
+  },
+  {
+    to: "/quant",
+    label: "量化模型",
+    icon: BarChart3,
   },
   {
     to: "/ai-advisor",
