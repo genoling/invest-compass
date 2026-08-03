@@ -58,5 +58,10 @@ service cloud.firestore {
     match /orders/{userId}/{doc} {
       allow read, write: if true;
     }
+
+    // 模拟交易状态（单人使用，允许读写）
+    match /simulation/{doc} {
+      allow read, write: if true;
+    }
   }
 }

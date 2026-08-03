@@ -14,3 +14,6 @@ skills/
 # 临时输出
 bt_output.txt
 draft_output.log
+
+# Token 缓存（敏感信息）
+feishu_token_cache.json

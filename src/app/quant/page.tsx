@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import {
   BarChart3,
   TrendingUp,
@@ -22,6 +22,8 @@ import type { StrategyConfig, BacktestResult } from "@/lib/types/quant";
 import type { SimulatorState, OrderSide, OrderType } from "@/lib/types/trading";
 import { createInitialState, placeOrder, refreshPositions } from "@/lib/engine/simulator";
 import { useAutoTrade } from "@/lib/engine/useAutoTrade";
+import { saveSimState, loadSimState } from "@/lib/engine/persistence";
+import { buy as tradeBuy, sell as tradeSell, tradeHealthCheck } from "@/lib/trade/client";
 import AccountPanel from "@/components/quant/AccountPanel";
 import TradePanel from "@/components/quant/TradePanel";
 import EquityCurve from "@/components/quant/EquityCurve";
@@ -43,9 +45,22 @@ export default function QuantPage() {
   const [expandedBacktest, setExpandedBacktest] = useState<string | null>(null);
   const [expandedStrategy, setExpandedStrategy] = useState<string | null>(null);
 
-  // 模拟交易引擎
+  // 模拟交易引擎（带 Firestore 持久化）
   const [simState, setSimState] = useState<SimulatorState>(() => createInitialState(100000));
   const [lastOrderMsg, setLastOrderMsg] = useState("");
+
+  // 初始化：从 Firestore 加载
+  useEffect(() => {
+    loadSimState().then((saved) => {
+      if (saved) setSimState(saved);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 保存到 Firestore：每次状态变化时
+  useEffect(() => {
+    saveSimState(simState);
+  }, [simState]);
 
   // 自动交易（策略引擎）
   const { autoState, startAutoTrade, stopAutoTrade } = useAutoTrade(
@@ -55,20 +70,55 @@ export default function QuantPage() {
   const handlePlaceOrder = useCallback((params: {
     code: string; name: string; side: OrderSide; price: number; quantity: number; type: OrderType;
   }) => {
-    const preClose = 10; // 简化：用默认昨收（真实场景应从行情获取）
-    const { state, order } = placeOrder(simState, { ...params, preClose });
-    setSimState(state);
+    const { code, name, side, price, quantity } = params;
 
-    if (order.status === "rejected") {
-      setLastOrderMsg(`❌ ${order.rejectReason}`);
-    } else if (order.status === "filled") {
-      setLastOrderMsg(`✅ ${order.side === "buy" ? "买入" : "卖出"} ${order.name} ${order.quantity}股 成交`);
-    } else {
-      setLastOrderMsg(`📝 ${order.side === "buy" ? "买入" : "卖出"} ${order.name} ${order.quantity}股 已挂单`);
-    }
+    // 优先走 trade_server 模拟盘
+    tradeHealthCheck().then(async (healthy) => {
+      if (healthy) {
+        try {
+          if (side === "buy") {
+            await tradeBuy(code, name, price, quantity);
+          } else {
+            await tradeSell(code, price, quantity);
+          }
+          setLastOrderMsg(`✅ [模拟盘] ${side === "buy" ? "买入" : "卖出"} ${name} ${quantity}股 成交`);
+          // 刷新账户信息
+          const { fetchAccount } = await import("@/lib/trade/client");
+          const acc = await fetchAccount();
+          // 同步到自建引擎
+          setSimState((prev) => ({
+            ...prev,
+            account: {
+              ...prev.account,
+              availableCash: acc.cash,
+              positionValue: acc.positions.reduce((sum, p) => sum + p.avg_cost * p.quantity, 0),
+            },
+            positions: acc.positions.map((p) => ({
+              code: p.code, name: p.name, quantity: p.quantity,
+              availableQty: p.available_qty, avgCost: p.avg_cost,
+              currentPrice: p.avg_cost, marketValue: p.avg_cost * p.quantity,
+              pnl: 0, pnlPct: 0,
+            })),
+          }));
+          setTimeout(() => setLastOrderMsg(""), 3000);
+          return;
+        } catch (e) {
+          console.warn("trade_server 下单失败，回退自建引擎:", e);
+        }
+      }
 
-    // 3 秒后清除消息
-    setTimeout(() => setLastOrderMsg(""), 3000);
+      // 回退：自建模拟引擎
+      const preClose = 10;
+      const { state, order } = placeOrder(simState, { code, name, side, price, quantity, type: "market", preClose });
+      setSimState(state);
+
+      if (order.status === "rejected") {
+        setLastOrderMsg(`❌ ${order.rejectReason}`);
+      } else if (order.status === "filled") {
+        setLastOrderMsg(`✅ [本地] ${side === "buy" ? "买入" : "卖出"} ${name} ${quantity}股 成交`);
+      }
+      setTimeout(() => setLastOrderMsg(""), 3000);
+    });
   }, [simState]);
 
   const selectedBacktest = backtests.find((b) => b.id === expandedBacktest);
