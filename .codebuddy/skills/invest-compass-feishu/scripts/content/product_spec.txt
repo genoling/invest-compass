@@ -1,0 +1,22 @@
+一、项目概述
+智投罗盘（InvestCompass）是一套聚焦个人投资理念落地、覆盖行情获取、目标执行、决策辅助、知识支撑完整闭环的轻量级投资决策与资产管理 MVP。核心目标是将用户的投资理念转化为产品可执行的逻辑，提供从目标设定到操作建议的全流程支持。
+
+二、功能模块
+【2.1 实时资讯】行情跑马灯（8个品种，3秒自动刷新）、分类/关键词筛选、无限滚动、K线图（1min/5min/15min）。Mock 数据可直接运行。
+【2.2 投资目标管理】目标创建（短/中/长期、保守/稳健/激进）、持仓管理、进度追踪、再平衡建议、操作历史。React Hook Form + Zod 校验。
+【2.3 量化模型】策略管理（均线交叉/动量突破/均值回归/网格交易 4 种模板）、回测参数配置、回测结果展示（6项指标+权益曲线+交易记录）。详见 04_开发管理/量化模型使用指南。
+【2.4 AI 辅助决策】四维度分析（市场情绪/技术面/基本面/风险）、操作建议（买入/卖出/持有）、参数控制、结果复制。
+【2.5 知识学习】6大分类（投资理念/基础术语/技术分析/基本面/风险控制/策略案例）、难度筛选、搜索、进度统计、全文阅读。
+
+三、技术栈
+前端：React 18 + TypeScript + Vite + Tailwind CSS 3.x + Recharts + React Hook Form + Zod
+后端：Firebase（Firestore / Cloud Functions / Hosting / AI Logic）
+金融数据：Finnhub + Alpha Vantage（待接入）
+
+四、待办规划
+- 接入真实 Firebase Cloud Functions 替代 Mock 数据
+- 接入 Finnhub + Alpha Vantage 金融数据 API
+- 接入 Gemini Pro (Firebase AI Logic) 真实 AI 分析
+- 量化模型实盘交易接口对接
+- 支付模块 (Stripe) 集成
+- GitHub CI/CD + 飞书文档同步

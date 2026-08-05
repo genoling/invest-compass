@@ -8,12 +8,13 @@ dist
 .cache
 *.tsbuildinfo
 
-# 其他项目文件
-skills/
+# Python 缓存
+__pycache__/
+*.pyc
 
 # 临时输出
 bt_output.txt
 draft_output.log
 
-# Token 缓存（敏感信息）
+# Token 缓存（敏感信息，skill 生成，不可提交）
 feishu_token_cache.json
